@@ -1,6 +1,9 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import {initializeFirestore} from 'firebase/firestore'
+
+
 // Firebase config
 // const firebaseConfig = {
 //   apiKey: Constants.manifest.extra.apiKey,

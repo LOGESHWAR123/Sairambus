@@ -6,7 +6,7 @@ import { auth, database } from "../config/firebase";
 import DropCard from "../component/DropCard";
 import { Platform } from 'react-native';
 import {collection,orderBy,query,onSnapshot,} from "firebase/firestore";
-//import { Button } from "react-native-web";
+import Icon from 'react-native-vector-icons/MaterialIcons';
 const catImageUrl =
   "dhttps://i.guim.co.uk/img/media/26392d05302e02f7bf4eb143bb84c8097d09144b/446_167_3683_2210/master/3683.jpg?width=1200&height=1200&quality=85&auto=format&fit=crop&s=49ed3252c0b2ffb49cf8b508892e452d";
 
@@ -23,7 +23,8 @@ const Home = () => {
   useEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
-        <Text>Home</Text>
+        <Icon name="home" size={30} color={colors.primary} marginLeft={8}/>
+        
       ),
 
       headerRight: () => (
@@ -33,12 +34,12 @@ const Home = () => {
           }}
           onPress={() => navigation.navigate("Userprofile")}
         >
-          <Text>User</Text>
+         <Icon name="person" size={30} color={colors.primary}/>
+          {/* <Text>User</Text> */}
         </TouchableOpacity>
       ),
     });
   }, [navigation]);
-
   const collectionRef = collection(database, "Route 1");
   useLayoutEffect(() => {
     const q = query(collectionRef, orderBy("time", "desc"));
@@ -84,12 +85,12 @@ const Home = () => {
       </View>
 
       <ScrollView>
-       {/* {filteredData.map((value, key) => (
+       {filteredData.map((value, key) => (
           // onPress={()=>navigation.navigate('BusRoute',{place:value.name,time:value.time,price:value.price})}
           // onPress={() => navigation.navigate("ContactInfo",{price:value.price,place:value.name})}
           <TouchableOpacity
             key={key}
-            onPress={()=>navigation.navigate('Ticket')}
+            onPress={() => navigation.navigate("ContactInfo",{price:value.price,place:value.name})}
           >
             <DropCard
               place={value.name}
@@ -98,8 +99,8 @@ const Home = () => {
               h={120}
             />
           </TouchableOpacity>
-        ))} */}
-        <TouchableOpacity
+        ))}
+        {/* <TouchableOpacity
             onPress={()=>navigation.navigate('ContactInfo')}
           >
             <DropCard
@@ -108,7 +109,7 @@ const Home = () => {
               price={price}
               h={120}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
       </ScrollView>
     </View>
     
