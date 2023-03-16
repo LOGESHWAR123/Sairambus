@@ -1,47 +1,15 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useState,useLayoutEffect } from 'react';
+import React, { useState,useLayoutEffect,useEffect } from 'react';
 import { View, Text, Dimensions, StatusBar,TextInput,Button,TouchableOpacity} from 'react-native';
 import { StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import colors from '../colors';
 import { getAuth} from "firebase/auth";
-import {collection,addDoc,orderBy,query,onSnapshot,getDocs,docRef,getDoc,doc,where} from 'firebase/firestore';
+import {collection,addDoc,orderBy,query,onSnapshot,getDocs,docRef,getDoc,doc,where,setDoc} from 'firebase/firestore';
 import { auth, database} from '../config/firebase'; 
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import RazorpayCheckout from 'react-native-razorpay';
 
-
-
-const timings = [
-  { time: '03:35', stop: 'SRM University Trichy' },
-  { time: '03:40', stop: 'No 1 Tollgate' },
-  { time: '03:50', stop: 'Trichy TVS Bus Stand' },
-  { time: '04:00', stop: 'Central Bus Stand' },
-  { time: '04:00', stop: 'Airport' },
-];
-const payment = () => {
-  var options = {
-      description: 'BusApp payment',
-      image: 'https://upload.wikimedia.org/wikipedia/en/6/61/Sri_Sai_Ram_Engineering_College_logo.png',
-      currency: 'INR',
-      key: 'rzp_test_AHMQcxkRqC6Spu',
-      amount: '500000',
-      name: 'Sairam Transport',
-      prefill: {
-        email: 'void@razorpay.com',
-        contact: '8667075377',
-        name: 'Razorpay Software'
-      },
-      theme: {color: '#0672CF'}
-    }
-    RazorpayCheckout.open(options).then((data) => {
-      // handle success
-      alert(`Success: ${data.razorpay_payment_id}`);
-    }).catch((error) => {
-      // handle failure
-      alert(`Error: ${error.code} | ${error.description}`);
-    });
-}
 function ContactInfo({route}) {
     const navigation=useNavigation();
     const {seatid}=route.params;
@@ -53,30 +21,65 @@ function ContactInfo({route}) {
       name: "Loading...",
       mobile: "Loading...",
     });
-  
-  //const currentmail=getAuth()?.currentUser.email;
-  const currentmail="sec20it039@sairamtap.edu.in";
-  useLayoutEffect(() => {
-    const collectionRef = collection(database, 'users');
-      const q = query(collectionRef, where("mail", "==", currentmail));
+
+    const currentMail = getAuth()?.currentUser.email;
+    const id=currentMail.split("@")[0];
+    //const currentMail="sec20it035@sairamtap.edu.in"
+    console.log(details);
+    
+    useEffect(() => {
+      const collectionRef = collection(database, 'users');
+      const q = query(collectionRef, where("mail", "==", currentMail));
       const unsubscribe = onSnapshot(q, querySnapshot => {
-        setdetails(
-          querySnapshot.docs.map(doc => 
-            (
-            {
-            mail:doc.data().mail,
-            phone: doc.data().mobile,
-            name:doc.data().name
-          }))
-        ),
-        
-        console.log(querySnapshot.size);
-      });        
+        const userData = querySnapshot.docs.map(doc => ({
+          mail: doc.data().mail,
+          phone: doc.data().mobile,
+          name: doc.data().name,
+        }));
+        setdetails(userData[0]);
+     
+      });
     
-    return unsubscribe;
-    }, 
-    
-    []);
+      return unsubscribe;
+    }, [currentMail]);
+
+    console.log(details);
+    const payment = () => {
+      var options = {
+          description: 'BusApp payment',
+          image: 'https://upload.wikimedia.org/wikipedia/en/6/61/Sri_Sai_Ram_Engineering_College_logo.png',
+          currency: 'INR',
+          key: 'rzp_test_AHMQcxkRqC6Spu',
+          amount: price+"00",
+          name: 'Sairam Transport',
+          prefill: {
+            email: details?.mail,
+            contact: details?.phone,
+            name: details?.name
+          },
+          theme: {color: '#0672CF'}
+        }
+        RazorpayCheckout.open(options).then((data) => { 
+
+          console.log(data.razorpay_payment_id);
+
+          const collectionRef = collection(database, `users/${id}/BookingHistory`);
+          setDoc(doc(collectionRef, data.razorpay_payment_id), {
+            time: new Date().toLocaleString(),
+            transactionId: data.razorpay_payment_id, 
+            price:price, 
+            destination: place
+    }) 
+      
+  
+          // handle success
+          alert(`Success: ID${data.razorpay_payment_id}`);
+        }).catch((error) => {
+          alert(`Error: ${error.code} | ${error.description}`);
+        });
+    }
+  
+
 
 
 
@@ -93,7 +96,7 @@ function ContactInfo({route}) {
             <View style={{justifyContent:"space-between"}}> 
                 {/* <Text style={{fontSize:15}}>Chennai -Trichy</Text> */}
                 <Text style={{fontSize:15}}>6:00 PM - 5:00 AM</Text>
-                <Text style={{fontSize:15,fontWeight:"bold",color:"black"}}>Seat Number : <Text style={{color:colors.primary,fontSize:15,fontWeight:"bold"}}>{seatid}</Text></Text>
+                <Text style={{fontSize:15,fontWeight:"bold",color:"black"}}>Seats Left : <Text style={{color:colors.primary,fontSize:15,fontWeight:"bold"}}>15</Text></Text>
             </View>
             <View style={{justifyContent:"space-between"}}>
                 {/* <Text style={styles.subheading}>12 Jan 2023 | Mon</Text> */}
@@ -106,13 +109,13 @@ function ContactInfo({route}) {
     <ScrollView>
 
     <View style={{padding:15}}>
-        <Text style={{fontSize:18,fontWeight:"bold",color:"black",marginBottom:20}}>Traveler Information</Text>
+        <Text style={{fontSize:18,fontWeight:"bold",color:"black",marginBottom:20}}>Traveller Information</Text>
         <Text style={{marginBottom:10,}}>Passenger Name</Text>
         <TextInput
                 style={styles.input}
                 placeholder="   Your Name"
                 keyboardType="default"
-                value={details[0]?.name}
+                value={details?.name}
                 editable={false}
         />
 
@@ -120,7 +123,7 @@ function ContactInfo({route}) {
         <TextInput
                 style={styles.input}
                 placeholder="   Your Mobile Number"
-                value={details[0]?.phone}
+                value={details?.phone}
                 editable={false}
                 keyboardType="default"
         />

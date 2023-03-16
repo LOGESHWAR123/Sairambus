@@ -1,4 +1,5 @@
-import React, { useState, createContext, useContext, useEffect } from 'react';
+import React, { useState, createContext, useContext, useEffect} from 'react';
+import { Component } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { View, ActivityIndicator } from 'react-native';
@@ -12,7 +13,8 @@ import SeatSelection from './screens/SeatSelection';
 import ContactInfo from './screens/ContactInfo';
 import Userprofile from './screens/UserProfile';
 import ForgetPassword from './screens/ForgetPassword';
-
+import Ticket from './screens/Ticket';
+import SplashScreen from 'react-native-splash-screen';
 
 
 const Stack = createStackNavigator();
@@ -35,6 +37,7 @@ function HomeStack() {
       <Stack.Screen name='SeatSelection' component={SeatSelection}/>
       <Stack.Screen name='ContactInfo' component={ContactInfo}/>
       <Stack.Screen name='Userprofile' component={Userprofile}/>
+      <Stack.Screen name='Ticket' component={Ticket}/>
     </Stack.Navigator>
   );
 }
@@ -74,14 +77,21 @@ if (isLoading) {
 
 return (
     <NavigationContainer>
-      {/* {user ? <HomeStack /> : <AuthStack />} */}
-      <HomeStack/>
+      {user ? <HomeStack /> : <AuthStack />}
+      {/* <HomeStack/> */}
     </NavigationContainer>
     
   );
 }
 
 export default function App() {
+
+  useEffect(() => {
+    setTimeout(() => {
+      SplashScreen.hide();
+     }, 1500);
+   }, []) 
+
   return (
     <AuthenticatedUserProvider>
       <RootNavigator/>

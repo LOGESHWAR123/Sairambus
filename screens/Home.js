@@ -100,8 +100,8 @@ const Home = () => {
             />
           </TouchableOpacity>
         ))}
-        {/* <TouchableOpacity
-            onPress={()=>navigation.navigate('ContactInfo')}
+        <TouchableOpacity
+            onPress={()=>navigation.navigate('Ticket')}
           >
             <DropCard
               place={name}
@@ -109,7 +109,7 @@ const Home = () => {
               price={price}
               h={120}
             />
-          </TouchableOpacity> */}
+          </TouchableOpacity>
       </ScrollView>
     </View>
     

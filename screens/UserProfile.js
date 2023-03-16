@@ -64,8 +64,8 @@ useEffect(() => {
         </View>
 
         <View style={{width:"50%",justifyContent:"center"}}>
-              <Text style={{color:"white",fontSize:20,marginLeft:10,marginBottom:2,fontWeight:"bold"}}>{details.name}</Text>
-              <Text style={{color:"white",fontSize:12,marginLeft:10,marginBottom:2}} >{details.mail.split("@")[0]}</Text>
+              <Text style={{color:"white",fontSize:20,marginLeft:10,marginBottom:2,fontWeight:"bold"}}>{details?.name}</Text>
+              <Text style={{color:"white",fontSize:12,marginLeft:10,marginBottom:2}} >{details?.mail.split("@")[0]}</Text>
         </View>
 
       </View>
@@ -74,7 +74,7 @@ useEffect(() => {
 
         <Text style={{color: "#5e5e5e" ,fontSize:12,marginBottom:5,marginBottom:10}}>P R O F I L E   S E C T I O N</Text>
 
-      <TouchableOpacity style={{borderColor:"blue",borderColor:"green", marginTop:10}} onPress={()=>navigation.navigate('Home')}>
+      <TouchableOpacity style={{borderColor:"blue",borderColor:"green", marginTop:10}} onPress={()=>navigation.navigate('Ticket')}>
       <View
         style={{backgroundColor: "white",width: "100%",height:50,borderColor: "black",flexDirection:"row",}}>
         {/* <FontAwesome name="ticket" size={25} color={"#5e5e5e"} style={{marginLeft: 10,marginTop:10}}/>  */}
