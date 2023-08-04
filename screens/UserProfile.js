@@ -1,13 +1,15 @@
 import React, { Component,useLayoutEffect, useState,useEffect } from 'react';
-import {StyleSheet,Text,View,Image,Button,TouchableOpacity,TextInput, BackHandler} from 'react-native';
+import {StyleSheet,Text,View,Image,Button,TouchableOpacity,TextInput, BackHandler,Modal,Alert, Pressable,Linking} from 'react-native';
 import { getAuth} from "firebase/auth";
 import colors from '../colors';
 import { Dimensions } from "react-native";
 import { auth, database} from '../config/firebase'; 
 import {  fetchSignInMethodsForEmail } from 'firebase/auth';
 import { signOut } from 'firebase/auth';
-import {collection,addDoc,orderBy,query,onSnapshot,getDocs,docRef,getDoc,doc,where} from 'firebase/firestore';
+import {collection,addDoc,orderBy,query,onSnapshot,getDocs,docRef,getDoc,doc,where,updateDoc} from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Entypo';
+import Icon1 from 'react-native-vector-icons/FontAwesome'
 
 const Userprofile = () =>  {
   const navigation=useNavigation();
@@ -19,13 +21,25 @@ const Userprofile = () =>  {
 
 const [details, setDetails] = useState({
   mail: "Loading...",
-  name: "Loading...",
+  name: "",
   mobile: "Loading...",
 });
 
-//const currentMail = getAuth()?.currentUser.email;
-const currentMail="sec20it039@sairamtap.edu.in"
+const [editName,seteditName]=useState(details?.name);
+const [editMobile,seteditMobile]=useState(0);
+
+
+const currentMail = getAuth()?.currentUser.email;
+const id= currentMail.split("@")[0];
+
 console.log(details);
+
+
+const [modalVisible, setModalVisible] = useState(false);
+
+const [modalVisible1, setModalVisible1] = useState(false);
+
+const { width } = Dimensions.get("window");
 
 useEffect(() => {
   const collectionRef = collection(database, 'users');
@@ -43,6 +57,55 @@ useEffect(() => {
   return unsubscribe;
 }, [currentMail]);
 
+
+function editdetails(){
+
+  const docRef = doc(database, "users",id);
+          getDoc(docRef).then((docSnap) => {
+            if(docSnap.exists()){
+              updateDoc(docRef, {
+                name:editName,
+                mobile:editMobile
+            }); 
+            
+
+            Alert.alert(
+              "Edit Profile",
+              "Profile Edited Successfully",
+              [
+                {
+                  text: "Ok",
+                  onPress: () => {
+                      
+                  },
+                },
+              ],
+            )
+
+
+            }
+            else{
+              Alert.alert(
+                "Something Went Wrong",
+                "Please Try Again Later",
+                [
+                  {
+                    text: "Back",
+                    onPress: () => {
+                        
+                    },
+                  },
+                ],
+              )
+
+
+            }
+            
+        })
+
+
+}
+
    {
     return (
       <View style={styles.container}>
@@ -57,15 +120,17 @@ useEffect(() => {
         <Image
               style={styles.avatar}
               source={{
-                uri: "https://bootdey.com/img/Content/avatar/avatar6.png",
+                uri:  "https://bootdey.com/img/Content/avatar/avatar6.png",
               }}
         />
+        
           
         </View>
 
-        <View style={{width:"50%",justifyContent:"center"}}>
-              <Text style={{color:"white",fontSize:20,marginLeft:10,marginBottom:2,fontWeight:"bold"}}>{details?.name}</Text>
-              <Text style={{color:"white",fontSize:12,marginLeft:10,marginBottom:2}} >{details?.mail.split("@")[0]}</Text>
+        <View style={{width:"50%",justifyContent:"space-evenly",height:120,flexDirection:"column"}}>
+              <Text style={{color:"white",fontSize:22,marginLeft:10,marginBottom:2,fontWeight:"bold"}}>{details?.name}</Text>
+              <Text style={{color:"white",fontSize:13,marginLeft:10,marginBottom:2}} ><Text style={{fontSize:15}}>College Id:  </Text>{details?.mail.split("@")[0].toUpperCase()}</Text>
+              <Text style={{color:"white",fontSize:13,marginLeft:10,marginBottom:2}} ><Text style={{fontSize:15}}>Mobile No:  </Text>{details?.phone}</Text>
         </View>
 
       </View>
@@ -74,25 +139,28 @@ useEffect(() => {
 
         <Text style={{color: "#5e5e5e" ,fontSize:12,marginBottom:5,marginBottom:10}}>P R O F I L E   S E C T I O N</Text>
 
-      <TouchableOpacity style={{borderColor:"blue",borderColor:"green", marginTop:10}} onPress={()=>navigation.navigate('Ticket')}>
+      <TouchableOpacity style={{borderColor:"blue",borderColor:"green", marginTop:10}} onPress={() => setModalVisible(true)}>
       <View
         style={{backgroundColor: "white",width: "100%",height:50,borderColor: "black",flexDirection:"row",}}>
+        <Icon name= "edit" size={25} olor={"#5e5e5e"} style={{marginLeft: 10,marginTop:10}}/>
         {/* <FontAwesome name="ticket" size={25} color={"#5e5e5e"} style={{marginLeft: 10,marginTop:10}}/>  */}
-        <Text style={{ color: "#5e5e5e", fontSize: 16,marginLeft:10 ,marginTop:10}}>Your Tickets</Text>
+        <Text style={{ color: "#5e5e5e", fontSize: 16,marginLeft:10 ,marginTop:10}}>Edit Profile</Text>
       </View>
     </TouchableOpacity>
 
-    <TouchableOpacity style={{borderColor:"blue",borderColor:"green", marginTop:10}}>
+    <TouchableOpacity style={{borderColor:"blue",borderColor:"green", marginTop:10}} onPress={()=>setModalVisible1(true)}>
       <View
         style={{backgroundColor: "white",width: "100%",height:50,borderColor: "black",flexDirection:"row",}}>
-        {/* <FontAwesome name="gear" size={25} color={"#5e5e5e"} style={{marginLeft: 10,marginTop:10}}/>  */}
-        <Text style={{ color: "#5e5e5e", fontSize: 16,marginLeft:10 ,marginTop:10}}>Settings</Text>
+        
+        <Icon name= "phone" size={25} olor={"#5e5e5e"} style={{marginLeft: 10,marginTop:10}}/>
+      { /* <FontAwesome name="gear" size={25} color={"#5e5e5e"} style={{marginLeft: 10,marginTop:10}}/>  */}
+        <Text style={{ color: "#5e5e5e", fontSize: 16,marginLeft:10 ,marginTop:10}}>Customer Support</Text>
       </View>
     </TouchableOpacity>
         
     
-    <TouchableOpacity onPress={onSignOut}>
-      <View
+    <View>
+      <TouchableOpacity onPress={onSignOut} 
         style={{
           backgroundColor: colors.primary,
           width: 120,
@@ -102,16 +170,112 @@ useEffect(() => {
           alignItems:"center",
           flexDirection:"row",
           marginTop:40,
-          marginLeft:"30%",
+          //marginLeft:"30%",
+          alignSelf:"center"
         }}
       >
+        <Icon name= "log-out" size={20} color={"white"}/>
         {/* <FontAwesome name="sign-out" size={22} color={"white"} style={{marginRight:10,justifyContent:"center"}}/> */}
         <Text style={{ color: "white", fontSize: 13, justifyContent:"center",alignItems:"center",}}>LogOut</Text>
-      </View>
+      </TouchableOpacity>
       <Text style={{color: "#5e5e5e" ,fontSize:13,marginTop:5,textAlign:"center"}}>Do you want to Signout?</Text>
-    </TouchableOpacity>
+    </View>
 
         </View>
+
+
+        <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert('Modal has been closed.');
+          setModalVisible(!modalVisible);
+        }}>
+        <View style={styles.centeredView}>
+          <View style={styles.viewWrapper}>
+          <View style={styles.modalView}>
+            <Text style={{fontSize:20,textAlign:"center",fontWeight:"bold"}}>Edit Details</Text>
+            <Text style={{marginTop:20,marginBottom:10,fontSize:15}}>Name</Text>
+            <TextInput
+                    style={styles.input}
+                    placeholder="   Enter your Name"
+                    keyboardType="default"
+                    value={editName}
+                    onChangeText={(text) => seteditName(text)}
+                    editable={true}
+            />
+
+            <Text style={{marginTop:20,marginBottom:10,fontSize:15}}>Mobile Number</Text>
+            <TextInput
+                    style={styles.input}
+                    placeholder="   Enter your Number"
+                    keyboardType="numeric"
+                    value={editMobile}
+                    editable={true}
+                    maxLength={10}
+                    onChangeText={(text) => seteditMobile(text)}
+            />  
+            <View style={{flexDirection:"row",justifyContent:"space-evenly",margin:30}}>
+            <TouchableOpacity
+              style={[styles.button, styles.buttonClose]}
+              onPress={ () =>{setModalVisible(!modalVisible);editdetails()}} >
+              <Text style={styles.textStyle}>Save</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => setModalVisible(!modalVisible)}>
+              <Text style={styles.textStyle}>Back </Text>
+            </TouchableOpacity>
+            </View>
+          </View>
+          </View>
+        </View>
+      </Modal>
+
+
+
+
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible1}
+        onRequestClose={() => {
+          Alert.alert('Modal has been closed.');
+          setModalVisible1(!modalVisible1);
+        }}>
+        <View style={styles.centeredView}>
+          <View style={styles.viewWrapper}>
+          <View style={styles.modalView1}>
+            <Text style={{fontSize:20,textAlign:"center",fontWeight:"bold"}}>Customer Support</Text>
+
+            <View style={{flexDirection:"row",justifyContent:"space-evenly",margin:30}}> 
+
+            <Pressable onPress={()=> Linking.openURL('mailto:sec20it039@sairamtap.edu.in')}>
+            <Icon name="mail" color={colors.primary} size={50} />
+            
+            </Pressable>
+            <Pressable onPress={()=> Linking.openURL('tel:+91 7550005050')}>
+            <Icon name="phone" color={colors.primary} size={50} />
+            </Pressable>
+            {/* <Icon name="phone" color={colors.primary} size={50} /> */}
+            </View>
+            
+            <View style={{flexDirection:"row",justifyContent:"space-evenly",margin:10}}>
+          
+            <TouchableOpacity
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => setModalVisible1(!modalVisible1)}>
+              <Text style={styles.textStyle}>Back </Text>
+            </TouchableOpacity>
+            </View>
+          </View>
+          </View>
+        </View>
+      </Modal>
+
         </View>
       </View>
     );
@@ -167,14 +331,92 @@ const styles = StyleSheet.create({
    borderRadius: 10,
 }, 
 avatar: {
-  width: 80,
-  height: 80,
+  width: 100,
+  height: 100,
   borderRadius: 63,
   borderWidth: 1,
   borderColor: "white",
-  marginBottom:10,
-
 },
+
+
+centeredView: {
+  flex: 1,
+  justifyContent: 'center',
+  alignItems: 'center',
+ 
+},
+modalView: {
+
+  margin: 60,
+  backgroundColor: colors.mediumGray,
+  borderRadius: 20,
+  width:350,
+  height:350,
+  padding:20,
+  shadowColor: '#fff',
+  shadowOffset: {
+    width: 0,
+    height: 2,
+  },
+  shadowOpacity: 1,
+  shadowRadius: 20,
+  elevation: 40,
+},
+
+modalView1: {
+
+  margin: 60,
+  backgroundColor: colors.mediumGray,
+  borderRadius: 20,
+  width:350,
+  height:240,
+  padding:20,
+  shadowColor: '#fff',
+  shadowOffset: {
+    width: 0,
+    height: 2,
+  },
+  shadowOpacity: 1,
+  shadowRadius: 20,
+  elevation: 40,
+},
+button: {
+  borderRadius: 5,
+  alignItems:"center",
+  justifyContent:"center",
+  width:100,
+  height:40,
+ 
+},
+viewWrapper: {
+  
+  flex:1,
+  alignItems: "center",
+  justifyContent: "center",
+  backgroundColor: "rgba(0, 0, 0, 0.2)",
+},
+buttonOpen: {
+  backgroundColor: colors.primary,
+},
+buttonClose: {
+  backgroundColor: colors.primary,
+},
+textStyle: {
+  color: 'white',
+  fontWeight: 'bold',
+  textAlign: 'center',
+},
+
+input:{
+  height:40, 
+  backgroundColor:colors.mediumGray, 
+  borderWidth:1,
+  borderRadius:5, 
+  borderColor:colors.primary,
+  width:"90%", 
+  paddingHorizontal:10
+},
+
 
 });
 

@@ -29,7 +29,15 @@ export default function Signup() {
             .catch((err) => Alert.alert("Login error", err.message));
     }
     else{
-      Alert.alert("Enter the Details Correctly");
+      Alert.alert(
+        'Sign up Failed',
+        'Kindly Enter your Details Correctly ',
+        [
+          { text: 'OK', style: 'OK' },
+          
+        ]
+      );
+      // Alert.alert("Enter the Details Correctly");
     }
   };
   
@@ -80,11 +88,11 @@ export default function Signup() {
        />
 
       </View>
-      <TouchableOpacity style={{justifyContent:"center",alignItems:"center",bottom:40}} onPress={onHandleSignUp} >
-        <View style={{height:60,width:150,backgroundColor:colors.primary,borderRadius:6,justifyContent:"center",alignItems:"center",marginTop:50}}>
+      <View style={{justifyContent:"center",alignItems:"center",bottom:40}}  >
+        <TouchableOpacity style={{height:60,width:150,backgroundColor:colors.primary,borderRadius:6,justifyContent:"center",alignItems:"center",marginTop:50}} onPress={onHandleSignUp}>
             <Text style={{fontSize:15,color:"white",fontWeight:"bold"}}>Sign Up</Text>
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
+      </View>
       <View style={{flexDirection: 'row', alignItems: 'center', alignSelf: 'center',marginBottom:10}}>
         <Text style={{color: 'gray', fontWeight: '600', fontSize: 14}}>Already having an account? </Text>
         <TouchableOpacity onPress={() => navigation.navigate('Login')}>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View, Button, TextInput, Image, SafeAreaView, TouchableOpacity, StatusBar, Alert,  } from "react-native";
+import { StyleSheet, Text, View, Button, TextInput, Image, SafeAreaView, TouchableOpacity, StatusBar, Alert} from "react-native";
 import { signInWithEmailAndPassword,fetchSignInMethodsForEmail,createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, database } from "../config/firebase";
 import colors from "../colors";
@@ -7,11 +7,11 @@ import { doc, setDoc } from "firebase/firestore";
 const backImage = require("../assets/backImage.png");
 import { useNavigation } from "@react-navigation/native";
 
-export default function Login() {
+export default function Login({navigation}) {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navi = useNavigation();
+  //const navi = useNavigation();
 
  
 
@@ -20,10 +20,26 @@ export default function Login() {
 
           signInWithEmailAndPassword(auth, email, password)
           .then(() => console.log("Login success"))
-          .catch((err) => Alert.alert("Enter correct mailid/Password"));
+          .catch((err) => Alert.alert(
+            'Login Failed',
+            'Kindly check your College mail id and Password ',
+            [
+              { text: 'OK', style: 'OK' },
+              
+            ]
+          ));
     }
     else{
-      Alert.alert("Enter your College mail id");
+
+      Alert.alert(
+        'Login Failed',
+        'Kindly check your College mail id and Password ',
+        [
+          { text: 'OK', style: 'OK' },
+          
+        ]
+      );
+      //Alert.alert("Enter your College mail id");
     }
   };
   
@@ -54,22 +70,22 @@ export default function Login() {
               
                 onChangeText={(text) => setPassword(text)}
        />
-      <TouchableOpacity onPress={()=> navi.navigate('ForgetPassword')}>
+      <TouchableOpacity onPress={()=> navigation.navigate('ForgetPassword')}>
       <Text>Forgot Password? <Text style={{color:colors.primary}}>Click here</Text></Text>
       </TouchableOpacity>
       
       </View>
       
 
-      <TouchableOpacity style={{justifyContent:"center",alignItems:"center"}} onPress={onHandleLogin} >
-        <View style={{height:60,width:150,backgroundColor:colors.primary,borderRadius:6,justifyContent:"center",alignItems:"center",margin:20}}>
+      <View style={{justifyContent:"center",alignItems:"center"}}  >
+        <TouchableOpacity style={{height:60,width:150,backgroundColor:colors.primary,borderRadius:6,justifyContent:"center",alignItems:"center",margin:20}} onPress={onHandleLogin}>
             <Text style={{fontSize:15,color:"white",fontWeight:"bold"}}>Login</Text>
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
+      </View>
 
       <View style={{flexDirection: 'row', alignItems: 'center', alignSelf: 'center',marginBottom:10}}>
         <Text style={{color: 'gray', fontWeight: '600', fontSize: 14}}>Don't have an account? </Text>
-        <TouchableOpacity onPress={() => navi.navigate('Signup')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
           <Text style={{color: colors.primary, fontWeight: '600', fontSize: 14}}> Sign Up</Text>
         </TouchableOpacity>
       </View>

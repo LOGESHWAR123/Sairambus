@@ -17,8 +17,8 @@ const SeatSelection = ({route}) => {
   const {time}=route.params;
   const{price}=route.params;
   const navigation=useNavigation();
-const [selectedseat,setselectedseat]=useState([{id:"0,0"}]);
-const [seatsplace,setseatsplace]=useState([]);
+  const [selectedseat,setselectedseat]=useState([{id:"0,0"}]);
+  const [seatsplace,setseatsplace]=useState([]);
 //console.log(selectedseat[0].id);
 
 
@@ -104,7 +104,6 @@ function seatNumber(text){
       { seatNumber: 43, seatType: 'booked' },
     ]}
     BlockedSeat={{ image: "C:/Users/Public/BusApp/BusAppMain/assets/seat.png", tintColor: 'black' }}
-    
     maxSeatToSelect={1}
     numberTextStyle={{ fontSize: 12 }}
     AvaiableSeat={{ image: "C:/Users/Public/BusApp/BusAppMain/assets/seat.png", tintColor: 'yellow' }}

@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore,connectFirestoreEmulator,initializeFirestore } from 'firebase/firestore';
+import { getFirestore ,initializeFirestore } from 'firebase/firestore';
 //import {initializeFirestore} from 'firebase/firestore'
 
 
@@ -24,10 +24,20 @@ const firebaseConfig = {
   appId: "1:1002382086816:web:376a06e16ad1ca21ffefc5"
 };
 // initialize firebase
-initializeApp(firebaseConfig); 
-//export const app = initializeApp(firebaseConfig);
+// initializeApp(firebaseConfig); 
+// //export const app = initializeApp(firebaseConfig);
 
-export const auth = getAuth();
-export const database = getFirestore(); 
+// export const auth = getAuth();
+// export const database = getFirestore(); 
+
+const app = initializeApp(firebaseConfig);
+
+export const auth = getAuth(app)
+
+export const database = initializeFirestore(app, {
+experimentalForceLongPolling: true
+})
+
+//export { db, auth }
 
 

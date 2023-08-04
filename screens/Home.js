@@ -5,8 +5,8 @@ import colors from "../colors";
 import { auth, database } from "../config/firebase";
 import DropCard from "../component/DropCard";
 import { Platform } from 'react-native';
-import {collection,orderBy,query,onSnapshot,} from "firebase/firestore";
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import {collection,orderBy,query,onSnapshot,doc} from "firebase/firestore";
+import Icon from 'react-native-vector-icons/FontAwesome';
 const catImageUrl =
   "dhttps://i.guim.co.uk/img/media/26392d05302e02f7bf4eb143bb84c8097d09144b/446_167_3683_2210/master/3683.jpg?width=1200&height=1200&quality=85&auto=format&fit=crop&s=49ed3252c0b2ffb49cf8b508892e452d";
 
@@ -20,28 +20,33 @@ const Home = () => {
   const name="Trichy";
   const time="9.00PM";
   const price="1200";
+
+
   useEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
-        <Icon name="home" size={30} color={colors.primary} marginLeft={8}/>
+        <Icon name="home" size={25} color={colors.primary} marginLeft={8}/>
         
       ),
 
-      headerRight: () => (
-        <TouchableOpacity
-          style={{
-            marginRight: 10,
-          }}
-          onPress={() => navigation.navigate("Userprofile")}
-        >
-         <Icon name="person" size={30} color={colors.primary}/>
-          {/* <Text>User</Text> */}
-        </TouchableOpacity>
-      ),
+      // headerRight: () => (
+      //   <TouchableOpacity
+      //     style={{
+      //       marginRight: 10,
+      //     }}
+      //     onPress={() => navigation.navigate("Userprofile")}
+      //   >
+      //    <Icon name="user" size={25} color={colors.primary}/>
+      //     {/* <Text>User</Text> */}
+      //   </TouchableOpacity>
+      // ),
     });
   }, [navigation]);
-  const collectionRef = collection(database, "Route 1");
+
+
+  const collectionRef = collection(database, "Buses");
   useLayoutEffect(() => {
+    //const collectionRef = collection(database, "Route 1");
     const q = query(collectionRef, orderBy("time", "desc"));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       setRouteway(
@@ -49,15 +54,49 @@ const Home = () => {
           name: doc.id,
           price: doc.data().price,
           time: doc.data().time,
+          routeid:doc.data().routeid,
+          day:doc.data().date,
+          drivername:doc.data().drivername,
+          drivernumber:doc.data().drivernumber,
         }))
       ),
         SetArea(querySnapshot.docs.map((doc) => doc.id));
+
+      //console.log(querySnapshot.size);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  const [seatcount,addseatcount]=useState([{"0":0}]);
+  const collectionRef1 = collection(database, "SeatBookingCount");
+  useLayoutEffect(() => {
+    //const collectionRef = collection(database, "Route 1");
+    //const q = query(collectionRef1, orderBy("time", "desc"));
+    const unsubscribe = onSnapshot(collectionRef1, (querySnapshot) => {
+      addseatcount(
+        querySnapshot.docs.map((doc) => ({
+          [doc.id]:doc.data().seats
+        }))
+      ),
+        
 
       console.log(querySnapshot.size);
     });
 
     return unsubscribe;
   }, []);
+
+  function findseat(routeid){
+    for (let i = 0; i < seatcount.length; i++) {
+      if (seatcount[i][routeid]>=0) {
+        return seatcount[i][routeid]; 
+      }
+      
+    }
+  }
+
+  //console.log(routeway);
   const filteredData = routeway.filter((item) =>
     item.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -73,7 +112,7 @@ const Home = () => {
             fontWeight: "bold",
             bottom: 20,
           }}
-        >Enter your Droping Point
+        >Enter your Dropping Point
         </Text>
         <TextInput
           style={styles.input}
@@ -90,17 +129,20 @@ const Home = () => {
           // onPress={() => navigation.navigate("ContactInfo",{price:value.price,place:value.name})}
           <TouchableOpacity
             key={key}
-            onPress={() => navigation.navigate("ContactInfo",{price:value.price,place:value.name})}
+            onPress={() => navigation.navigate("ContactInfo",{price:value.price,place:value.name,routeid:value.routeid,time:value.time,day:value.day,drivername:value.drivername,drivernumber:value.drivernumber})}
           >
             <DropCard
               place={value.name}
-              time={value.time}
+              time={value.time+" PM"}
               price={value.price}
+              seat={`${Math.abs(55-findseat(value?.routeid))} Seats Left`}
               h={120}
+              day={value.day}
+              count={findseat(value.routeid)}
             />
           </TouchableOpacity>
         ))}
-        <TouchableOpacity
+        {/* <TouchableOpacity
             onPress={()=>navigation.navigate('Ticket')}
           >
             <DropCard
@@ -109,7 +151,7 @@ const Home = () => {
               price={price}
               h={120}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
       </ScrollView>
     </View>
     

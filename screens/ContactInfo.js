@@ -1,37 +1,78 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useState,useLayoutEffect,useEffect } from 'react';
-import { View, Text, Dimensions, StatusBar,TextInput,Button,TouchableOpacity} from 'react-native';
+import { View, Text, Dimensions, StatusBar,TextInput,Button,TouchableOpacity,Alert} from 'react-native';
 import { StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import colors from '../colors';
 import { getAuth} from "firebase/auth";
-import {collection,addDoc,orderBy,query,onSnapshot,getDocs,docRef,getDoc,doc,where,setDoc} from 'firebase/firestore';
+import {collection,addDoc,orderBy,query,onSnapshot,getDocs,docRef,getDoc,doc,where,setDoc,increment,updateDoc} from 'firebase/firestore';
 import { auth, database} from '../config/firebase'; 
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import RazorpayCheckout from 'react-native-razorpay';
+import { Table, TableWrapper, Row, Rows } from 'react-native-table-component';
+import axios from 'axios';
+import { encode } from 'base-64';
 
 function ContactInfo({route}) {
     const navigation=useNavigation();
+    const {time}=route.params;
     const {seatid}=route.params;
     const {place}=route.params; 
     const {price}=route.params;
+    const {routeid}=route.params;
+    const {day}=route.params;
+    const {drivername}=route.params;
+    const {drivernumber}=route.params;
+    console.log(routeid);
   
     const [details, setdetails] = useState({
       mail: "Loading...",
       name: "Loading...",
-      mobile: "Loading...",
+      phone: "Loading...",
     });
 
     const currentMail = getAuth()?.currentUser.email;
     const id=currentMail.split("@")[0];
-    //const currentMail="sec20it035@sairamtap.edu.in"
-    console.log(details);
+    const [bookings,setbookings]=useState([]);
+    const [totalAmount, setTotalAmount] = useState(0);
+    const [booking1,setbookings1] = useState(0);
+    const [functions,setfunctions]=useState([]);
+ 
+
+   
+
+//const docRef = doc(database, "SeatBookingCount", routeid);
+//   getDoc(docRef).then((docSnap) => {
+//     if(!docSnap.exists()){
+      
+//       setDoc(doc(database, "SeatBookingCount", routeid), {
+//         seats:1, 
+//       })
+//     }
+//     else{
+//       console.log("Hii How");
+//     }
+  
+// })
+
+// const docRef = doc(database, `SeatBookingCount/3/3`);
+// getDoc(docRef).then((docSnap) => {
+//   if(docSnap.exists()){
+//     console.log(docSnap.data());
+//     console.log("--->");
+//   }
+//   else{
+//     console.log("Hi");
+//   }
+// })
+
     
     useEffect(() => {
       const collectionRef = collection(database, 'users');
       const q = query(collectionRef, where("mail", "==", currentMail));
       const unsubscribe = onSnapshot(q, querySnapshot => {
         const userData = querySnapshot.docs.map(doc => ({
+          name:doc.data().name,
           mail: doc.data().mail,
           phone: doc.data().mobile,
           name: doc.data().name,
@@ -41,44 +82,234 @@ function ContactInfo({route}) {
       });
     
       return unsubscribe;
-    }, [currentMail]);
+    }, []);
 
-    console.log(details);
-    const payment = () => {
-      var options = {
-          description: 'BusApp payment',
-          image: 'https://upload.wikimedia.org/wikipedia/en/6/61/Sri_Sai_Ram_Engineering_College_logo.png',
-          currency: 'INR',
-          key: 'rzp_test_AHMQcxkRqC6Spu',
-          amount: price+"00",
-          name: 'Sairam Transport',
-          prefill: {
-            email: details?.mail,
-            contact: details?.phone,
-            name: details?.name
-          },
-          theme: {color: '#0672CF'}
-        }
-        RazorpayCheckout.open(options).then((data) => { 
-
-          console.log(data.razorpay_payment_id);
-
-          const collectionRef = collection(database, `users/${id}/BookingHistory`);
-          setDoc(doc(collectionRef, data.razorpay_payment_id), {
-            time: new Date().toLocaleString(),
-            transactionId: data.razorpay_payment_id, 
-            price:price, 
-            destination: place
-    }) 
-      
+    //console.log(details);
+    //console.log(day,"----->.>>>");
   
-          // handle success
-          alert(`Success: ID${data.razorpay_payment_id}`);
-        }).catch((error) => {
-          alert(`Error: ${error.code} | ${error.description}`);
-        });
+
+    useEffect(() => {
+      const collectionRef = collection(database, 'Functions',);
+      const unsubscribe = onSnapshot(collectionRef, querySnapshot => {
+        const func = querySnapshot.docs.map(doc => ({
+          
+          allow:doc.data().ticketallow,
+          key:doc.data().razorpaykey
+        }));
+        setfunctions(func[0]);
+     
+      });
+    
+      return unsubscribe;
+    }, []);
+
+    console.log(functions,"--->");
+    function findseat(seatcount,routeid){
+      for (let i = 0; i < seatcount.length; i++) {
+        if (seatcount[i][routeid]>=0) {
+          return seatcount[i][routeid]; 
+        }
+      
+      }
+    }
+
+    hello = '2021/11/18';
+    end = new Date('2002','11','04');
+    //console.log(end.toDateString());
+
+
+  var datesplit=day.split('-');
+  console.log(datesplit);
+  var dateconvertor=new Date(datesplit[2],datesplit[1],datesplit[0]);
+  var tempdate=dateconvertor.toDateString(); 
+  var temp1=tempdate.split(" ");
+
+  var date=temp1[2]+" "+temp1[1]+" "+temp1[3];
+  var finalday=temp1[0];
+  // console.log(temp1);
+  // console.log(date);
+
+
+  //console.log(findseat(seatcount,4));
+    
+
+    
+
+
+    const payment = () => {
+     var seatc=55-findseat(seatcount,routeid);
+     var bookedcount=findseat(seatcount,routeid);
+     console.log(seatc,'---->>');
+
+     if(functions.allow){
+
+      Alert.alert(
+        'Booking Failed',
+        'Booking Time is Closed ',
+        [
+          { text: 'OK', style: 'OK' },
+          
+        ]
+      );
+      return;
+     }
+
+     if(seatc>0){
+
+      var options = {
+        description: 'BusApp payment',
+        image: 'https://shorturl.at/afps3',
+        currency: 'INR',
+        key: 'rzp_test_AHMQcxkRqC6Spu',
+        amount: "1"+"00",
+        name: 'Sairam Transport',
+        prefill: {
+          email: details?.mail,
+          //contact: details?.phone,
+          name: details?.name
+        },
+        theme: {color: '#0672CF'}
+      }
+      RazorpayCheckout.open(options).then((data) => { 
+
+         console.log(data.razorpay_payment_id);
+
+        const collectionRef = collection(database, `users/${id}/BookingHistory`);
+
+        setDoc(doc(collectionRef, data.razorpay_payment_id), {
+          name:details.name,
+          bookingtime:new Date().toLocaleTimeString(),
+          bookingDay: new Date().toLocaleDateString(),
+          time: time,
+          day: day, 
+          transactionId: data.razorpay_payment_id, 
+          price:price, 
+          seatNumber:bookedcount, 
+          destination: place,
+          Email: currentMail,
+          drivername:drivername,
+          drivernumber:drivernumber,
+  }) 
+
+
+  const collectionRef1 = collection(database, 'BookingHistory');
+
+  setDoc(doc(collectionRef1,id), {
+    name:details.name,
+    bookingtime:new Date().toLocaleTimeString(),
+    bookingDay: new Date().toLocaleDateString(),
+    time: time,
+    day: day, 
+    transactionId: data.razorpay_payment_id, 
+    price:price, 
+    seatNumber:bookedcount, 
+    destination: place,
+    Email: currentMail
+})
+
+          const docRef = doc(database, "SeatBookingCount", routeid);
+          getDoc(docRef).then((docSnap) => {
+            if(docSnap.exists()){
+              updateDoc(docRef, {
+                seats: increment(1)
+            }); 
+            }
+            else{
+              setDoc(docRef, {
+                seats: increment(1)
+            }); 
+            }
+        })
+
+        setTimeout(() => {
+          Alert.alert(
+            "Payment Successful",
+            "Kindly Download your ticket in User Profile Section",
+            [
+              {
+                text: "Ok",
+                onPress: () => {
+                    navigation.navigate('Ticket')
+                },
+              },
+              {
+                text: "Back",
+                onPress: () => {
+                    
+                },
+              },
+            ],
+          )
+        }, 10)
+        //alert(`Success: ID${data.razorpay_payment_id}`);
+        //return;
+
+      }).catch((error) => {
+        //alert(`Error: ${error.code} | ${error.description.code}`);
+        //console.log(error.error.description);
+        console.log(error);
+        setTimeout(() => {
+          Alert.alert(
+            "Payment Unsuccessful",
+            `${error.error.description}`,
+            [
+              {
+                text: "Ok",
+                onPress: () => {
+      
+                },
+              },
+            ],
+          )
+        }, 10)
+        
+      });
+
+
+     }
+     else{
+
+      Alert.alert(
+        'Booking Failed',
+        'All seats are booked ',
+        [
+          { text: 'OK', style: 'OK' },
+          
+        ]
+      );
+
+     }
+      
     }
   
+    const [seatcount,addseatcount]=useState([{"0":0}]);
+    const collectionRef1 = collection(database, "SeatBookingCount");
+    useLayoutEffect(() => {
+      //const collectionRef = collection(database, "Route 1");
+      //const q = query(collectionRef1, orderBy("time", "desc"));
+      const unsubscribe = onSnapshot(collectionRef1, (querySnapshot) => {
+        addseatcount(
+          querySnapshot.docs.map((doc) => ({
+            [doc.id]:doc.data().seats
+          }))
+        ),
+          
+  
+        console.log(querySnapshot.size,"--->");
+      });
+  
+      return unsubscribe;
+    }, []);
+
+    
+    console.log(findseat(routeid));
+    console.log(seatcount);
+
+    const [tableHead, setTableHead] = useState(['Driver Details']);
+    const [tableData, setTableData] = useState([
+        ['Mr.C.Ebinaser','9840449697'],
+        ['Mr.R.Arul','9840449697']
+    ]);
 
 
 
@@ -89,19 +320,19 @@ function ContactInfo({route}) {
     <View style={{flex:1}}>
       <View style={styles.bluecontainer}>
         <Text style={styles.heading}>College  - {place}</Text>
-        <Text style={styles.subheading}>12 Jan 2023 | Mon</Text>
+        <Text style={styles.subheading}>{date} | {finalday}</Text>
         
         <View style={styles.whitebox}>
         
             <View style={{justifyContent:"space-between"}}> 
                 {/* <Text style={{fontSize:15}}>Chennai -Trichy</Text> */}
-                <Text style={{fontSize:15}}>6:00 PM - 5:00 AM</Text>
-                <Text style={{fontSize:15,fontWeight:"bold",color:"black"}}>Seats Left : <Text style={{color:colors.primary,fontSize:15,fontWeight:"bold"}}>15</Text></Text>
+                <Text style={{fontSize:15}}>{time} PM - 5:00 AM</Text>
+                <Text style={{fontSize:15,fontWeight:"bold",color:"black"}}>Seats Left : <Text style={{color:colors.primary,fontSize:15,fontWeight:"bold"}}>{Math.abs(findseat(seatcount,routeid)-55)}</Text></Text>
             </View>
             <View style={{justifyContent:"space-between"}}>
                 {/* <Text style={styles.subheading}>12 Jan 2023 | Mon</Text> */}
-                <Text style={{fontWeight:"bold",fontSize:20,color:colors.primary}}>{price}</Text>
-                <Text>9h</Text>
+                <Text style={{fontWeight:"bold",fontSize:20,color:colors.primary}}>₹{price}</Text>
+                <Text>TN 64 P 7997</Text>
             </View>
         </View>
       </View>
@@ -126,23 +357,60 @@ function ContactInfo({route}) {
                 value={details?.phone}
                 editable={false}
                 keyboardType="default"
+        /> 
+
+      {/* <Text style={{marginTop:10,marginBottom:20}}>Email ID</Text>
+        <TextInput
+                style={styles.input}
+                placeholder="   Your Email ID"
+                value={details?.mail}
+                editable={false}
+                keyboardType="default"
+        /> */}
+      </View>
+
+      <View style={{padding:15}}>
+      <Text style={{fontSize:18,fontWeight:"bold",color:"black",marginBottom:0}}>Bus Driver Information</Text>
+      
+      <Text style={{marginTop:10,marginBottom:10}}>{drivername}</Text>
+      <View style={{flexDirection:"row",justifyContent:"space-between"}}>
+        <TextInput
+                style={styles.input}
+                placeholder="   Your Mobile Number"
+                value={drivernumber}
+                editable={false}
+                keyboardType="default"
         />
       </View>
+
+      
+
+      <Text style={{marginTop:10,marginBottom:10}}>Mr.R.Arul</Text>
+      <View style={{flexDirection:"row",justifyContent:"space-between"}}>
+        <TextInput
+                style={styles.input}
+                placeholder="   Your Mobile Number"
+                value={drivernumber}
+                editable={false}
+                keyboardType="default"
+        />
+      </View>
+      
+ 
+      
+      </View>
+      
+     
+
+      
     </ScrollView>   
 </View>
-<TouchableOpacity onPress={payment}>
-
-<View style={{backgroundColor:"#2b84ea",position:"absolute",bottom:0,width:"100%",height:55,flexDirection:"row",padding:10,justifyContent:"flex-end"}}>
-    <Text style={{alignSelf:"center",fontSize:15,color:"white",marginRight:10}}>  Proceed to Payment </Text>
-    <Icon name="arrow-right-alt" size={30} color='#fff' style={{top:2}}/>
-    {/* <FontAwesome name="long-arrow-right" size={30} color={"white"} style={{alignSelf:"center",marginRight:15}}/> */}
-  {/* <TouchableOpacity>
-        <View style={{height:50,width:130,borderColor:"white",borderWidth:1,borderRadius:6,justifyContent:"center",alignItems:"center",marginTop:10}}>
-            <Text style={{fontSize:15,color:"white",fontWeight:"bold"}}>Book Ticket</Text>
+    <TouchableOpacity onPress={payment}>
+        <View style={{backgroundColor:"#2b84ea",position:"absolute",bottom:0,width:"100%",height:55,flexDirection:"row",padding:10,justifyContent:"flex-end"}}>
+            <Text style={{alignSelf:"center",fontSize:15,color:"white",marginRight:10}}>  Proceed to Payment </Text>
+            <Icon name="arrow-right-alt" size={30} color='#fff' style={{top:2}}/>
         </View>
-      </TouchableOpacity> */}
-  </View>
-</TouchableOpacity>
+    </TouchableOpacity>
 </View>
   );
 }
@@ -159,7 +427,6 @@ heading:{
     color:"white", 
     fontSize:25, 
     fontWeight:"bold",
-    // color:"black",
 },
 subheading:{
     color:"white", 
@@ -192,250 +459,33 @@ input1:{
     borderRadius:10, 
     borderColor:"black",
     width:"90%", 
+}, 
+
+head: {  
+  height: 40, 
+  backgroundColor: colors.primary,
 },
- 
+wrapper: { 
+  flexDirection: 'row',
+},
+title: { 
+  flex: 1, 
+  backgroundColor: colors.primary,
+  color:'white'
+},
+row: {  
+  height: 40,  
+},
+text: { 
+  textAlign: 'center',
+  
+},
+texthead: { 
+  textAlign: 'center',
+  fontSize:16, 
+  color:"white",
+  fontWeight:"bold"
+  
+},
 });
-
 export default ContactInfo;
-
-
-
-// import { useNavigation } from '@react-navigation/native';
-// import React, { useState,useLayoutEffect } from 'react';
-// import { View, Text, Dimensions, StatusBar,TextInput,Button,TouchableOpacity} from 'react-native';
-// import { StyleSheet } from 'react-native';
-// import { ScrollView } from 'react-native-gesture-handler';
-// import colors from '../colors';
-// import { getAuth} from "firebase/auth";
-// import {collection,addDoc,orderBy,query,onSnapshot,getDocs,docRef,getDoc,doc,where} from 'firebase/firestore';
-// import { auth, database} from '../config/firebase'; 
-// import RazorpayCheckout from 'react-native-razorpay';
-
-
-// const timings = [
-//   { time: '03:35', stop: 'SRM University Trichy' },
-//   { time: '03:40', stop: 'No 1 Tollgate' },
-//   { time: '03:50', stop: 'Trichy TVS Bus Stand' },
-//   { time: '04:00', stop: 'Central Bus Stand' },
-//   { time: '04:00', stop: 'Airport' },
-// ];
-// const payment = () => {
-//   var options = {
-//       description: 'BusApp payment',
-//       image: 'https://i.imgur.com/3g7nmJC.png',
-//       currency: 'INR',
-//       key: 'rzp_test_AHMQcxkRqC6Spu',
-//       amount: '500000',
-//       name: 'foo',
-//       prefill: {
-//         email: 'void@razorpay.com',
-//         contact: '8667075377',
-//         name: 'Razorpay Software'
-//       },
-//       theme: {color: '#0672CF'}
-//     }
-//     RazorpayCheckout.open(options).then((data) => {
-//       // handle success
-//       alert(`Success: ${data.razorpay_payment_id}`);
-//     }).catch((error) => {
-//       // handle failure
-//       alert(`Error: ${error.code} | ${error.description}`);
-//     });
-// }
-
-// function ContactInfo({route}) {
-//     const navigation=useNavigation();
-//     const {place}=route.params; 
-//     const {price}=route.params;
-  
-//   const [details,setdetails]=useState();
-  
-//  //const currentmail=getAuth()?.currentUser.email.split('@')[0];
-//  const currentmail = "sec20it035@sairamtap.edu.in"
-//   console.log(currentmail);
-//   useLayoutEffect(() => {
-//     const collectionRef = collection(database, 'users');
-//       const q = query(collectionRef, where("mail", "==", currentmail));
-//       const unsubscribe = onSnapshot(q, querySnapshot => {
-//         setdetails(
-//           querySnapshot.docs.map(doc => 
-//             (
-//             {
-//             mail:doc.data().mail,
-//             phone: doc.data().mobile,
-//             name:doc.data().name
-//           }))
-//         ),
-//         console.log(querySnapshot.size);
-//       });        
-    
-//     return unsubscribe;
-//     }, 
-    
-//     []);
-
-//   return (
-    
-//     <View>
-
-//     <View>
-      
-//       <View style={styles.bluecontainer}>
-//         <Text style={styles.heading}>College  - {place}</Text>
-//         {/* <Text style={styles.heading}>College  - Trichy</Text> */}
-//         <Text style={styles.subheading}>12 Jan 2023 | Mon</Text>
-        
-//         <View style={styles.whitebox}>
-        
-//             <View style={{justifyContent:"space-between"}}> 
-//                 <Text style={{fontSize:15}}>Chennai -Trichy</Text>
-//                 <Text style={{fontSize:15}}>6:00 PM - 5:00 AM</Text>
-//                 <Text style={{fontSize:15,fontWeight:"bold",color:"black"}}>Seat Number : <Text style={{color:colors.primary,fontSize:15,fontWeight:"bold"}}>CE</Text></Text>
-//             </View>
-//             <View style={{justifyContent:"space-between"}}>
-//                 <Text style={styles.subheading}>12 Jan 2023 | Mon</Text>
-//                 <Text style={{fontWeight:"bold",fontSize:20,color:colors.primary}}>{price}</Text>
-//                 <Text style={{fontWeight:"bold",fontSize:20,color:colors.primary}}>2000</Text>
-//                 <Text>9h</Text>
-//             </View>
-//         </View>
-//       </View>
-
-//       <ScrollView>
-//       <View style={{padding:15}}>
-//         <Text style={{fontSize:18,fontWeight:"bold",color:"black",marginBottom:20}}>Traveller Information</Text>
-
-
-//         <View style={{flexDirection:"row",justifyContent:"space-around"}}>
-
-//         <View>
-//         <Text style={{marginBottom:10,fontSize:16}}>College ID</Text>
-//         <Text style={{marginBottom:10,fontSize:16}}>Place</Text>
-//         <Text style={{marginBottom:10,fontSize:16}}>Price</Text>
-//         <Text style={{marginBottom:10,fontSize:16}}>Time</Text>
-
-
-//         </View>
-
-//         <View>
-//         <Text style={{marginBottom:10,fontSize:17}}>: </Text>
-//         <Text style={{marginBottom:10,fontSize:17}}>: </Text>
-//         <Text style={{marginBottom:10,fontSize:17}}>: </Text>
-//         <Text style={{marginBottom:10,fontSize:17}}>: </Text>
-
-//         </View>
-
-
-//         <View>
-//         <Text style={{marginBottom:10,fontSize:17}}>{currentmail}</Text>
-//         <Text style={{marginBottom:10,fontSize:17}}>{place}</Text>
-//         <Text style={{marginBottom:10,fontSize:17}}>{price}</Text>
-//         <Text style={{marginBottom:10,fontSize:17}}>{currentmail}</Text>
-//         {/* <Text style={{marginBottom:10,fontSize:17}}>sec20i035@sairamtap.edu.in</Text>
-//         <Text style={{marginBottom:10,fontSize:17}}>Trichy</Text>
-//         <Text style={{marginBottom:10,fontSize:17}}>2000</Text>
-//         <Text style={{marginBottom:10,fontSize:17}}>9.00PM</Text> */}
-//         </View>
-
-//         </View>
-//       </View>
-
-//       {/* <View style={{padding:15}}>
-//         <Text style={{fontSize:18,fontWeight:"bold",color:"black",marginBottom:20}}>Bus Information</Text>
-
-
-//         <View style={{flexDirection:"row",justifyContent:"space-around"}}>
-
-//         <View>
-//         <Text style={{marginBottom:10,fontSize:16}}>Bus Driver Name</Text>
-//         <Text style={{marginBottom:10,fontSize:16}}>Bus Number</Text>
-//         <Text style={{marginBottom:10,fontSize:16}}>Bus Registration Id</Text>
-
-
-//         </View>
-
-//         <View>
-//         <Text style={{marginBottom:10,fontSize:17}}>: </Text>
-//         <Text style={{marginBottom:10,fontSize:17}}>: </Text>
-//         <Text style={{marginBottom:10,fontSize:17}}>: </Text>
-//         <Text style={{marginBottom:10,fontSize:17}}>: </Text>
-
-//         </View>
-
-
-//         <View>
-//         <Text style={{marginBottom:10,fontSize:17}}>Temp Name</Text>
-//         <Text style={{marginBottom:10,fontSize:17}}></Text>
-//         <Text style={{marginBottom:10,fontSize:17}}>{price}</Text>
-
-
-//         </View>
-
-//         </View>
-//       </View> */}
-
-//       </ScrollView>
- 
-//     </View>
-
-//       {/* <View style={{backgroundColor:"white"}}> */}
-//       <TouchableOpacity style={{alignItems:"center"}}>
-//         <View style={{height:50,width:170,backgroundColor:colors.primary,borderRadius:6,justifyContent:"center",alignItems:"center",margin:20}}>
-//             <Text style={{fontSize:15,color:"white",fontWeight:"bold"}} onPress={payment}>Proceed  Payment</Text>
-//         </View>
-//       </TouchableOpacity>
-//       {/* </View> */}
-
-//     </View>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-
-// bluecontainer:{
-//     backgroundColor:colors.primary, 
-//     height:250,
-//     justifyContent:"center",
-//     alignItems:"center"
-// },
-// heading:{
-//     color:"white", 
-//     fontSize:25, 
-//     fontWeight:"bold",
-//     // color:"black",
-// },
-// subheading:{
-//     color:"white", 
-//     fontSize:15, 
-//     marginTop:10,
-
-// },
-// whitebox:{
-//     height:100, 
-//     backgroundColor:"white",
-//     width:"90%", 
-//     borderRadius:10,
-//     marginTop:20,
-//     flexDirection:"row",
-//     justifyContent:"space-between",
-//     padding:20
-// }, 
-// input:{
-//     height:40, 
-//     backgroundColor:colors.lightGray, 
-//     borderRadius:5, 
-//     borderColor:"black",
-//     width:"80%", 
-// },
-// input1:{
-//     //bottom:10,
-//     height:40, 
-//     backgroundColor:colors.lightGray, 
-//     borderRadius:10, 
-//     borderColor:"black",
-//     width:"90%", 
-// },
- 
-// });
-
-// export default ContactInfo;
