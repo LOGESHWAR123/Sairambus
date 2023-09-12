@@ -158,17 +158,18 @@ function ContactInfo({route}) {
 
       var options = {
         description: 'BusApp payment',
-        image: 'https://shorturl.at/afps3',
+        image: "https://sairamgroup.in/wp-content/themes/sairamgroup/images/footer-logo.png",
         currency: 'INR',
         key: 'rzp_test_AHMQcxkRqC6Spu',
-        amount: "1"+"00",
+        amount: price+"00",
         name: 'Sairam Transport',
         prefill: {
           email: details?.mail,
           //contact: details?.phone,
           name: details?.name
         },
-        theme: {color: '#0672CF'}
+       // #0672CF
+        theme: {color: 'blue'}
       }
       RazorpayCheckout.open(options).then((data) => { 
 
@@ -189,6 +190,8 @@ function ContactInfo({route}) {
           Email: currentMail,
           drivername:drivername,
           drivernumber:drivernumber,
+          Attendence:true,
+          routeid:routeid
   }) 
 
 
@@ -204,7 +207,8 @@ function ContactInfo({route}) {
     price:price, 
     seatNumber:bookedcount, 
     destination: place,
-    Email: currentMail
+    Email: currentMail,
+    routeid:routeid
 })
 
           const docRef = doc(database, "SeatBookingCount", routeid);

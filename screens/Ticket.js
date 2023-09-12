@@ -96,7 +96,7 @@ async function generateTicket(ticket1,index) {
       </style>
       
           <header>
-              <img style="width: 102%;" src="https://firebasestorage.googleapis.com/v0/b/taxautomation-1214c.appspot.com/o/Group%20622header.jpg?alt=media&token=1a8d4207-2939-43fc-80ff-25ac5b85df1a">
+              <img style="width: 102%;" src="https://firebasestorage.googleapis.com/v0/b/sairambusapp.appspot.com/o/Group%20622header.jpg?alt=media&token=d18314f0-1461-4a0d-b15a-c7c3bc74b90d">
           </header>
           <div style="display: flex;justify-content: space-between;padding: 0 40px 0 40px; margin-bottom: 20px;" >
          <div>

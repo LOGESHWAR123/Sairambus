@@ -29,7 +29,7 @@ const [editName,seteditName]=useState(details?.name);
 const [editMobile,seteditMobile]=useState(0);
 
 
-const currentMail = getAuth()?.currentUser.email;
+const currentMail = getAuth()?.currentUser?.email;
 const id= currentMail.split("@")[0];
 
 console.log(details);

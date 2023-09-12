@@ -24,7 +24,6 @@ import EditProfile from './screens/EditProfile';
 const Tab = createBottomTabNavigator();
 
 
-
 const Stack = createStackNavigator();
 const AuthenticatedUserContext = createContext({});
 

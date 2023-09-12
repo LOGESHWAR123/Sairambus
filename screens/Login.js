@@ -6,7 +6,7 @@ import colors from "../colors";
 import { doc, setDoc } from "firebase/firestore"; 
 const backImage = require("../assets/backImage.png");
 import { useNavigation } from "@react-navigation/native";
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function Login({navigation}) {
 
   const [email, setEmail] = useState("");
@@ -15,37 +15,57 @@ export default function Login({navigation}) {
 
  
 
-  const onHandleLogin = () => {
-    if ((email !== "" && password !== "") && email.split('@')[1]=='sairamtap.edu.in') {
+  // const onHandleLogin = () => {
+  //   if ((email !== "" && password !== "") && email.split('@')[1]=='sairamtap.edu.in') {
 
-          signInWithEmailAndPassword(auth, email, password)
-          .then(() => console.log("Login success"))
-          .catch((err) => Alert.alert(
-            'Login Failed',
-            'Kindly check your College mail id and Password ',
-            [
-              { text: 'OK', style: 'OK' },
+  //         signInWithEmailAndPassword(auth, email, password)
+  //         .then(() => console.log("Login success"))
+  //         .catch((err) => Alert.alert(
+  //           'Login Failed',
+  //           'Kindly check your College mail id and Password ',
+  //           [
+  //             { text: 'OK', style: 'OK' },
               
-            ]
-          ));
-    }
-    else{
+  //           ]
+  //         ));
+  //   }
+  //   else{
 
-      Alert.alert(
-        'Login Failed',
-        'Kindly check your College mail id and Password ',
-        [
-          { text: 'OK', style: 'OK' },
+  //     Alert.alert(
+  //       'Login Failed',
+  //       'Kindly check your College mail id and Password ',
+  //       [
+  //         { text: 'OK', style: 'OK' },
           
-        ]
-      );
-      //Alert.alert("Enter your College mail id");
+  //       ]
+  //     );
+  //     //Alert.alert("Enter your College mail id");
+  //   }
+  // };
+
+  const onHandleLogin = () => {
+    if ((email !== "" && password !== "") && email.split('@')[1] === 'sairamtap.edu.in') {
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          AsyncStorage.setItem('userLoggedIn', 'true'); // Save login state
+          //navi.navigate('Busroute');
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      Alert.alert('Login Failed...', 'Kindly Check your Mail id and Password', [{ text: 'OK' }]);
     }
   };
   
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>BUS APP </Text>
+      <Image 
+      source={{uri:"https://sairamgroup.in/wp-content/themes/sairamgroup/images/footer-logo.png"}}
+      style={{width:155,height:100,bottom:50}}
+      
+      />
+      <Text style={styles.heading}>Sairam Bus</Text>
       <View style={styles.subcontainer}>
       <Text style={{fontSize:25,fontWeight:"bold",color:colors.primary,textAlign:"center",paddingTop:10}}>Login</Text>
       <View style={styles.logincontainer}> 
@@ -102,8 +122,8 @@ const styles = StyleSheet.create({
     alignItems:"center"
   },
   subcontainer:{
-    width:300,
-    height: 400,
+    width:340,
+    height: 450,
     backgroundColor:"white",
     borderRadius:15, 
     padding:10

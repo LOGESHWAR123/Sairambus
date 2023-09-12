@@ -43,7 +43,7 @@ export default function Signup() {
   
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>BUS APP </Text>
+      <Text style={styles.heading}>Sairam Bus </Text>
       <View style={styles.subcontainer}>
       <Text style={{fontSize:25,fontWeight:"bold",color:colors.primary,textAlign:"center",paddingTop:10}}>Sign Up</Text>
       <View style={styles.logincontainer}> 
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     alignItems:"center"
   },
   subcontainer:{
-    width:300,
+    width:340,
     height: 500,
     backgroundColor:"white",
     borderRadius:15, 
