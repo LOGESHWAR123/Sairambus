@@ -6,7 +6,6 @@ import DropCard from '../component/DropCard';
 import { useNavigation } from '@react-navigation/native';
 import { auth, database } from '../config/firebase';
 import {collection,orderBy,query,onSnapshot, getDoc, getDocs,setDoc,doc} from 'firebase/firestore';
-import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import Share, { Button } from 'react-native-share';
 import { ToWords } from 'to-words';
 

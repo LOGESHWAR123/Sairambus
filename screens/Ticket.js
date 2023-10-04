@@ -7,7 +7,7 @@ import DropCard from '../component/DropCard';
 import { useNavigation } from '@react-navigation/native';
 import { auth, database } from '../config/firebase';
 import {collection,orderBy,query,onSnapshot, getDoc, getDocs,setDoc,doc} from 'firebase/firestore';
-import RNHTMLtoPDF from 'react-native-html-to-pdf';
+// import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import Share, { Button } from 'react-native-share';
 import { ToWords } from 'to-words';
 
@@ -187,22 +187,22 @@ async function generateTicket(ticket1,index) {
       directory: 'Documents',
     };
   
-    let file = await RNHTMLtoPDF.convert(options)
-    // console.log(file.filePath);
-    const pdfPath = file.filePath;
-    const sharePDF = async () => {
-      const shareOptions = {
-        type: 'application/pdf',
-        url: `file://${pdfPath}`,
-        title: 'Share PDF',
-      };
-      try {
-        await Share.open(shareOptions);
-      } catch (error) {
-        console.log('Error sharing PDF: ', error);
-      }
-    };
-    sharePDF();
+    // let file = await RNHTMLtoPDF.convert(options)
+    // // console.log(file.filePath);
+    // const pdfPath = file.filePath;
+    // const sharePDF = async () => {
+    //   const shareOptions = {
+    //     type: 'application/pdf',
+    //     url: `file://${pdfPath}`,
+    //     title: 'Share PDF',
+    //   };
+    //   try {
+    //     await Share.open(shareOptions);
+    //   } catch (error) {
+    //     console.log('Error sharing PDF: ', error);
+    //   }
+    // };
+    // sharePDF();
     //alert(file.filepath);
 }
 
