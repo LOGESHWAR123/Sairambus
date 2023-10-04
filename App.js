@@ -21,6 +21,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import colors from './colors';
 import EditProfile from './screens/EditProfile';
+import Payucheck from './screens/Payucheck';
 const Tab = createBottomTabNavigator();
 
 
@@ -50,6 +51,7 @@ function HomeStack() {
       <Stack.Screen name='CancelConformation' component={CancelConfirmation}/>
       <Stack.Screen name='CancelledTickets' component={CancelledTickets}/>
       <Stack.Screen name='EditProfile' component={EditProfile}/>
+      <Stack.Screen name='Payucheck' component={Payucheck}/>
     </Stack.Navigator>
   );
 }

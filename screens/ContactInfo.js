@@ -9,11 +9,14 @@ import {collection,addDoc,orderBy,query,onSnapshot,getDocs,docRef,getDoc,doc,whe
 import { auth, database} from '../config/firebase'; 
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import RazorpayCheckout from 'react-native-razorpay';
+
 import { Table, TableWrapper, Row, Rows } from 'react-native-table-component';
 import axios from 'axios';
 import { encode } from 'base-64';
 
-function ContactInfo({route}) {
+function ContactInfo({route}) 
+
+{
     const navigation=useNavigation();
     const {time}=route.params;
     const {seatid}=route.params;
@@ -25,6 +28,7 @@ function ContactInfo({route}) {
     const {drivernumber}=route.params;
     console.log(routeid);
   
+
     const [details, setdetails] = useState({
       mail: "Loading...",
       name: "Loading...",
@@ -67,31 +71,33 @@ function ContactInfo({route}) {
 // })
 
     
-    useEffect(() => {
+useEffect(() => {
       const collectionRef = collection(database, 'users');
       const q = query(collectionRef, where("mail", "==", currentMail));
       const unsubscribe = onSnapshot(q, querySnapshot => {
-        const userData = querySnapshot.docs.map(doc => ({
+        const userData = querySnapshot.docs.map(doc => (
+          {
           name:doc.data().name,
           mail: doc.data().mail,
           phone: doc.data().mobile,
           name: doc.data().name,
-        }));
+        }
+        ));
         setdetails(userData[0]);
      
-      });
+});
     
       return unsubscribe;
-    }, []);
+}, []);
 
     //console.log(details);
     //console.log(day,"----->.>>>");
   
 
-    useEffect(() => {
+  useEffect(() => {
       const collectionRef = collection(database, 'Functions',);
       const unsubscribe = onSnapshot(collectionRef, querySnapshot => {
-        const func = querySnapshot.docs.map(doc => ({
+      const func = querySnapshot.docs.map(doc => ({
           
           allow:doc.data().ticketallow,
           key:doc.data().razorpaykey
@@ -124,37 +130,35 @@ function ContactInfo({route}) {
   var tempdate=dateconvertor.toDateString(); 
   var temp1=tempdate.split(" ");
 
-  var date=temp1[2]+" "+temp1[1]+" "+temp1[3];
-  var finalday=temp1[0];
-  // console.log(temp1);
-  // console.log(date);
+var date=temp1[2]+" "+temp1[1]+" "+temp1[3];
+var finalday=temp1[0];
+
+  function formatDate(date) {
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-indexed
+      const year = date.getFullYear().toString();
+      return `${day}/${month}/${year}`;
+  }
 
 
-  //console.log(findseat(seatcount,4));
-    
-
-    
-
-
-    const payment = () => {
+const payment = () => {
      var seatc=55-findseat(seatcount,routeid);
      var bookedcount=findseat(seatcount,routeid);
      console.log(seatc,'---->>');
 
-     if(functions.allow){
-
+     if(functions.allow)
+     {
       Alert.alert(
         'Booking Failed',
         'Booking Time is Closed ',
         [
           { text: 'OK', style: 'OK' },
-          
         ]
       );
       return;
-     }
+}
 
-     if(seatc>0){
+if(seatc>0){
 
       var options = {
         description: 'BusApp payment',
@@ -180,7 +184,7 @@ function ContactInfo({route}) {
         setDoc(doc(collectionRef, data.razorpay_payment_id), {
           name:details.name,
           bookingtime:new Date().toLocaleTimeString(),
-          bookingDay: new Date().toLocaleDateString(),
+          bookingDay: formatDate(new Date()),
           time: time,
           day: day, 
           transactionId: data.razorpay_payment_id, 
@@ -192,15 +196,15 @@ function ContactInfo({route}) {
           drivernumber:drivernumber,
           Attendence:true,
           routeid:routeid
-  }) 
+}) 
 
 
-  const collectionRef1 = collection(database, 'BookingHistory');
+const collectionRef1 = collection(database, 'BookingHistory');
 
   setDoc(doc(collectionRef1,id), {
     name:details.name,
     bookingtime:new Date().toLocaleTimeString(),
-    bookingDay: new Date().toLocaleDateString(),
+    bookingDay: formatDate(new Date()),
     time: time,
     day: day, 
     transactionId: data.razorpay_payment_id, 
@@ -423,7 +427,7 @@ const styles = StyleSheet.create({
 
 bluecontainer:{
     backgroundColor:colors.primary, 
-    height:260,
+    height:220,
     justifyContent:"center",
     alignItems:"center"
 },
@@ -489,7 +493,7 @@ texthead: {
   fontSize:16, 
   color:"white",
   fontWeight:"bold"
-  
 },
 });
+
 export default ContactInfo;
